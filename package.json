@@ -1,0 +1,15 @@
+{
+  "name": "repair",
+  "version": "1.0.0",
+  "description": "code can change the world",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahbing/repair.git"
+  },
+  "author": "ahbing",
+  "license": "MIT"
+}
