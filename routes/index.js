@@ -1,12 +1,13 @@
-var express = require('express');
-var router = express.Router();
+'use strict';
+const express = require('express');
+const router = express.Router();
 
 module.exports = function(app) {
-  var auth = require('./auth');
-  var issue = require('./issue');
-  var issues = require('./issues');
+  const auth = require('./auth');
+  const issue = require('./issue');
+  const issues = require('./issues');
 
-  var routes = [
+  const routes = [
     { path: '', router: issues, api: true },
     { path: 'issues', router: issues, api: true },
     { path: 'issue', router: issue, api: true },

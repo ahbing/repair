@@ -1,3 +1,4 @@
+'use strict';
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
@@ -5,7 +6,7 @@ const ObjectId = Schema.Types.ObjectId;
 const IssueSchema = new Schema({
   title: { type: String },
   content: { type: String },
-  status: { type: Number, default: 0 },
+  status: { type: Number, default: 0 }, // 0：讨论区 1: 开发区
   createTime: { type: Date, default: Date.now }, // 创建时间
   updateTime: { type: Date, default: Date.now }, // 更新时间
   user: { type: Number },
