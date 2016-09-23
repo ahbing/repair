@@ -1,13 +1,9 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  if !user
-    a(href="/auth/github") login with github
-  else
-    a(href=user.profileUrl target="_blank") #{user.displayName}
-    img(src= user.avatar_url  alt= user.displayName)
-    a(href="/auth/logout") 退出
-  hr
-  
+  ul
+    each issue in issues
+      li
+        a(href="/issue/"+issue._id) #{issue.title}
+        span #{issue.updateTime.toLocaleDateString()}
+

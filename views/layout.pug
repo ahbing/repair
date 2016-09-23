@@ -4,4 +4,15 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
+    h1= title
+    p Welcome to #{title}
+    if !user
+      a(href="/auth/github") login with github
+      a(href="/auth/github") 发起问题
+    else
+      a(href=user.profileUrl target="_blank") #{user.displayName}
+      img(src= user.avatar_url  alt= user.displayName)
+      a(href="/issue/new") 发起问题
+      a(href="/auth/logout") 退出
+    hr
     block content

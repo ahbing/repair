@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h1 #{issue.title}
+  p #{issue.content}
+  time #{issue.updateTime.toLocaleDateString()}
+  span 状态: #{!issue.status ? '正在被讨论中' : '有'+ issue.git.length + '个同学正在尝试解决这个问题'}
+  hr
+  p 仓库
+  ul
+    each git in issue.git
+      li
+        a(href=git, target="_blank") #{git}
+  hr
+  p 添加仓库
+    form(action="/issue/join", method="POST")
+      input(type="text", name="gitUrl")
+      input(type="hidden", name="id", value=issue._id)
+      input(type="submit", value="join")

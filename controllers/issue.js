@@ -9,11 +9,19 @@ exports.publish = function(req, res) {
   let title = body.title;
   let content = body.content;
   let user = body.user;
-  let newIssue = issue.newAndSave(title, content, user);
+  let newIssue = issueProxy.newAndSave(title, content, user);
   newIssue.then(function(issue) {
     return res.redirect('/issue/' + issue._id);
   }).catch(onerror);
 
+};
+exports.showNewIssue = function(req, res) {
+  let user = req.session.user;
+  let templateOrStatusCode = user && user._id ? 'newIssue' : 302; 
+  res.repair.send(templateOrStatusCode, {
+   message: 200,
+   user: req.session.user, 
+  }, '/auth/github')
 };
 
 exports.showIssue = function(req, res) {
@@ -23,11 +31,13 @@ exports.showIssue = function(req, res) {
     // @todo
     // let user = yield user.getUserById(issue.user);
     // let gits = yield git 仓库信息
+    console.log(issue)
     return issue;
   }).then(function(issue) {
-    res.repair.send(null, {
+    res.repair.send('issue', {
       message: 200,
-      issue: issue
+      issue: issue,
+      user: req.session.user
     })
   }).catch(onerror);
 };
@@ -41,11 +51,12 @@ exports.join = function(req, res) {
     //@todo 验证 git 仓库的正确性
     let issue = yield issueProxy.updateIssueGitById(issueId, gitUrl);
     return issue;
-  }).then(function(value) {
-    res.repair.send('', {
+  }).then(function(issue) {
+    res.repair.send(302, {
       message: 200,
-      value: value
-    })
+      issue: issue,
+      user: req.session.user,
+    }, '/issue/' + issueId)
   }).catch(onerror)
 };
 
