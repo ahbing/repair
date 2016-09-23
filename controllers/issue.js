@@ -12,9 +12,7 @@ exports.publish = function(req, res) {
   let newIssue = issue.newAndSave(title, content, user);
   newIssue.then(function(issue) {
     return res.redirect('/issue/' + issue._id);
-  }).catch(function(err) {
-    console.log(err);
-  });
+  }).catch(onerror);
 
 };
 
@@ -22,6 +20,7 @@ exports.showIssue = function(req, res) {
   let issueId = req.params.id;
   co(function*() {
     let issue = yield issueProxy.getIssueById(issueId);
+    // @todo
     // let user = yield user.getUserById(issue.user);
     // let gits = yield git 仓库信息
     return issue;
@@ -39,7 +38,7 @@ exports.join = function(req, res) {
   let gitUrl = querystring.unescape(body.gitUrl);  // parse url
   let issueId = body.id;
   co(function*() {
-    // 验证 git 仓库的正确性
+    //@todo 验证 git 仓库的正确性
     let issue = yield issueProxy.updateIssueGitById(issueId, gitUrl);
     return issue;
   }).then(function(value) {
@@ -49,9 +48,6 @@ exports.join = function(req, res) {
     })
   }).catch(onerror)
 };
-
-// exports.up = function(req, res) {};
-// exports.down = function(req, res) {};
 
 exports.showEditIssue = function(req, res) {
   co(function*() {
@@ -85,3 +81,4 @@ exports.update = function(req, res) {
   )
   .catch(onerror);
 };
+

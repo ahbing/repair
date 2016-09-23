@@ -4,9 +4,16 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-
+const session = require('express-session');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github').Strategy;
+const RedisStore = require('connect-redis')(session);
 const app = express();
 
+
+const config = require('./config');
+const redisClient = require('redis').createClient(config.redis_port, config.redis_host);
+const githubStrategyMiddleware = require('./middlewares/github_strategy');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -14,9 +21,26 @@ app.set('view engine', 'pug');
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser(config.session_secret));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: config.session_secret,
+  store: new RedisStore({ client: redisClient, ttl: 3 * 24 * 60 * 60 }),
+  resave: true,
+  saveUninitialized: true,
+}));
+
+app.use(passport.initialize())
+
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+passport.deserializeUser(function (user, done) {
+  done(null, user);
+});
+// github oauth
+passport.use(new GitHubStrategy(config.GITHUB_OAUTH, githubStrategyMiddleware));
 
 app.use(function(req, res, next) {
   res.repair = {
@@ -24,9 +48,7 @@ app.use(function(req, res, next) {
       if (req.api || req.xhr) {
         res.json(data);
       } else {
-        if (typeof template === 'number' && template < 400) {
-          res.redirect(redirect);
-        }
+        if (template < 400) return res.redirect(redirect);
         if (template) return res.render(template, data); 
         res.send(data);
       }
@@ -40,7 +62,7 @@ app.use(function(req, res, next) {
     return next();
   }
   req.api = true;
-  // 暂时没有做认证
+  // @todo add authorization
 });
 
 require('./routes')(app);

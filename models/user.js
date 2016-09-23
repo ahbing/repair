@@ -4,17 +4,19 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
 const UserSchema = new Schema({
-  name: { type: String },
-  email: { type: String },
-  location: { type: String  },
-  signature: { type: String  },
-  profile: { type: String  },
-  avatar: { type: String  },
   githubId: { type: String },
-  githubUsername: { type: String },
-  githubAccessToken: { type: String },
-  create_at: { type: Date, default: Date.now },
   accessToken: {type: String},
+  profileUrl: { type: String  },
+  displayName: { type: String },
+  username: { type: String }, // github unique
+  avatar_url: { type: String  },
+  company: { type: String  },
+  blog: { type: String  },
+  location: { type: String  },
+  email: { type: String },
+  bio: { type: String  },
+  create_at: { type: Date, default: Date.now },
+  update_at: { type: Date, default: Date.now },
 });
 
 UserSchema.index({email: 1}, {unique: true});

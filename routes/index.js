@@ -11,7 +11,7 @@ module.exports = function(app) {
     { path: '', router: issues, api: true },
     { path: 'issues', router: issues, api: true },
     { path: 'issue', router: issue, api: true },
-    // { path: 'auth', router: auth, api: true }
+    { path: 'auth', router: auth, api: true }
   ];
 
   routes.forEach(function(route) {

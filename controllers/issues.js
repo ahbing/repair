@@ -14,9 +14,10 @@ exports.showIssues = function(req, res) {
     // let git = yield git 仓库查询
     return issue;
   }).then(function(value) {
-    res.repair.send(null, {
+    res.repair.send('index', {
       mesage: true,
-      value: value
+      value: value,
+      user: req.session.user
     }) 
   }).catch(onerror);
 };

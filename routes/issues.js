@@ -6,4 +6,3 @@ const issues = require('../controllers/issues');
 router.get('/', issues.showIssues);
 
 module.exports = router;
-
