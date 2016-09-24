@@ -5,10 +5,9 @@ const router = express.Router();
 const passport = require('passport');
 const co = require('co');
 const userProxy = require('../proxy/user');
-const onerrror = require('../common/').onerror;
 
 router.get('/github', passport.authenticate('github'))
-router.get('/github/callback', 
+router.get('/github/callback',
   passport.authenticate('github', { failureRedirect: '/error' }),
   function(req, res) {
     let user = req.user;
@@ -37,12 +36,17 @@ router.get('/github/callback',
         message: 200,
         user: user
       }, '/');
-    }).catch(onerrror)
+    }).catch(function(err) {
+      res.repair.send('error', {
+        error: err
+      })
+    })
   });
 
 router.get('/logout', function(req, res) {
+
   req.session.destroy(function(err) {
-    if (err) onerrror(err);
+    if (err) res.repair.send('error', { error: err });
     return res.redirect('/');
   })
 });

@@ -9,7 +9,7 @@ const IssueSchema = new Schema({
   status: { type: Number, default: 0 }, // 0：讨论区 1: 开发区
   createTime: { type: Date, default: Date.now }, // 创建时间
   updateTime: { type: Date, default: Date.now }, // 更新时间
-  user: { type: Number },
+  user: { type: String }, // user github Id
   up: { type: Number, default: 0 },
   down: { type: Number, default: 0 },
   git: [ { type: String } ]

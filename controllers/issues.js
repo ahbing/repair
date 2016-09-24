@@ -1,7 +1,6 @@
 'use strict';
 const co = require('co');
 const issuesProxy = require('../proxy/issues');
-const onerror = require('../common').onerror;
 
 exports.showIssues = function(req, res) {
   let page = req.query.page || 0;
@@ -12,13 +11,16 @@ exports.showIssues = function(req, res) {
     let issues = yield issuesProxy.getIssues(page, per_page, query);
     // let user = yield 用户信息查询
     // let git = yield git 仓库查询
-    console.log(issues);
     return issues;
   }).then(function(issues) {
     res.repair.send('index', {
       mesage: true,
       issues: issues,
       user: req.session.user
-    }) 
-  }).catch(onerror);
+    })
+  }).catch(function(err) {
+    res.repair.send('error', {
+      error: err
+    })
+  });
 };

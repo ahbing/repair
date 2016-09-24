@@ -49,7 +49,7 @@ app.use(function(req, res, next) {
         res.json(data);
       } else {
         if (template < 400) return res.redirect(redirect);
-        if (template) return res.render(template, data); 
+        if (template) return res.render(template, data);
         res.send(data);
       }
     }

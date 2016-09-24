@@ -1,7 +1,7 @@
 'use strict';
 const models = require('../models');
 const Issue = models.Issue;
-
+const selectIssueFileds = 'title content status user updateTime git';
 // let getIssuesCount = exports.getIssuesCount = function() {
 //   return Issues.find({})
 // };
@@ -24,5 +24,6 @@ let getIssues = exports.getIssues = function getIssues(page, per_page, query={})
     })
     .skip(skip)
     .limit(per_page)
+    .select(selectIssueFileds)
     .exec();
 };

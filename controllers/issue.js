@@ -2,7 +2,7 @@
 const co = require('co');
 const querystring = require('querystring');
 const issueProxy = require('../proxy/issue');
-const onerror = require('../common').onerror; 
+const errors = require('../common/errors');
 
 exports.publish = function(req, res) {
   let body = req.body;
@@ -12,15 +12,19 @@ exports.publish = function(req, res) {
   let newIssue = issueProxy.newAndSave(title, content, user);
   newIssue.then(function(issue) {
     return res.redirect('/issue/' + issue._id);
-  }).catch(onerror);
-
+  }).catch(function(err) {
+    res.repair.send('error', {
+      error: err
+    })
+  });
 };
+
 exports.showNewIssue = function(req, res) {
   let user = req.session.user;
-  let templateOrStatusCode = user && user._id ? 'newIssue' : 302; 
+  let templateOrStatusCode = user && user._id ? 'newIssue' : 302;
   res.repair.send(templateOrStatusCode, {
    message: 200,
-   user: req.session.user, 
+   user: req.session.user,
   }, '/auth/github')
 };
 
@@ -31,7 +35,7 @@ exports.showIssue = function(req, res) {
     // @todo
     // let user = yield user.getUserById(issue.user);
     // let gits = yield git 仓库信息
-    console.log(issue)
+    console.log(issue);
     return issue;
   }).then(function(issue) {
     res.repair.send('issue', {
@@ -39,7 +43,11 @@ exports.showIssue = function(req, res) {
       issue: issue,
       user: req.session.user
     })
-  }).catch(onerror);
+  }).catch(function(err) {
+    res.repair.send('error', {
+      error: err
+    })
+  });
 };
 
 // 添加仓库字段
@@ -57,39 +65,65 @@ exports.join = function(req, res) {
       issue: issue,
       user: req.session.user,
     }, '/issue/' + issueId)
-  }).catch(onerror)
+  }).catch(function(err) {
+    res.repair.send('error', {
+      error: err
+    })
+  })
 };
 
 exports.showEditIssue = function(req, res) {
+  let issueId = req.params.id;
+  let user = req.session.user;
+  console.log('session user', user);
   co(function*() {
     let issue = yield issueProxy.getIssueById(issueId);
+    console.log('issue', issue)
+    if (!user || user.githubId !== issue.user) {
+      yield Promise.reject(new errors.ForbiddenError('你没有权限进行这样的操作'))
+    }
     return issue;
   }).then(function(issue) {
-    res.repair.send(null, {
+    res.repair.send('editIssue', {
       message: 200,
-      issue: issue
+      issue: issue,
+      user: req.session.user
     })
-  }).catch(onerror);
+  }).catch(function(err) {
+    res.repair.send('error', {
+      error: err
+    })
+  });
 };
 
 exports.update = function(req, res) {
   let body = req.body;
   let issueId = body.id;
+  let user = req.session.user;
   let newBody = {
     title: body.title,
     content: body.content
   };
   co(function* () {
+    let curIssue = yield issueProxy.getIssueById(issueId);
+    if (!user || user.githubId !== curIssue.user) {
+      yield Promise.reject(new errors.ForbiddenError('你没有权限进行这样的操作'))
+    }
     let newIssue = yield issueProxy.updateIssueBodyById(issueId, newBody);
     return newIssue;
   }).then(
     function(newIssue) {
-      res.repair.send('', {
+      res.repair.send('issue', {
         message: 200,
-        issue: newIssue
+        issue: newIssue,
+        user: req.session.user,
       })
     }
   )
-  .catch(onerror);
+  .catch(function(err) {
+    res.repair.send('error', {
+      error: err
+    });
+  });
 };
 
